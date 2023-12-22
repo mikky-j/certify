@@ -12,9 +12,9 @@ enum CanisterError {
     NotCustodian,
 }
 
-impl Into<String> for CanisterError {
-    fn into(self) -> String {
-        match self {
+impl From<CanisterError> for String {
+    fn from(error: CanisterError) -> String {
+        match error {
             CanisterError::NotCustodian => "You are not a custodian in this canister".to_owned(),
         }
     }
@@ -35,9 +35,9 @@ enum NftError {
 }
 
 #[derive(CandidType, Deserialize, Clone)]
-enum DataType {
-    Link,
-    Raw,
+enum Data {
+    Link(String),
+    Raw(Bytes),
 }
 
 #[derive(CandidType, Deserialize, Clone, Default)]
@@ -69,8 +69,8 @@ type Bytes = Vec<u8>;
 
 #[derive(CandidType, Deserialize, Clone)]
 struct TokenData {
-    bytes: Bytes,
-    data_type: DataType,
+    name: String,
+    data: Data,
 }
 
 type TokenIdentifier = u64;
@@ -91,7 +91,7 @@ pub enum GenericValue {
     Int32Content(i32),
     Int64Content(i64),
     IntContent(Int),
-    FloatContent(f64), // motoko only support f64
+    FloatContent(f64),
     NestedContent(Vec<(String, GenericValue)>),
 }
 
@@ -125,7 +125,6 @@ struct InitArguments {
     name: Option<String>,
     symbol: Option<String>,
     logo: Option<String>,
-    custoidians: Option<HashSet<Principal>>,
 }
 
 #[derive(CandidType, Deserialize, Default)]
@@ -133,6 +132,7 @@ struct State {
     canister_metadata: CanisterMetaData,
     tokens: HashMap<TokenIdentifier, Token>,
     owners: HashMap<Principal, HashSet<TokenIdentifier>>,
+    owner_names: HashMap<String, Principal>,
     stats: Stats,
 }
 
@@ -152,7 +152,7 @@ fn init(args: Option<InitArguments>) {
             metadata.name = args.name;
             metadata.symbol = args.symbol;
             metadata.logo = args.logo;
-            metadata.custodians = args.custoidians.unwrap_or(default_custodians);
+            metadata.custodians = default_custodians;
             metadata.created_at = api::time();
             metadata.upgraded_at = api::time();
         } else {
@@ -162,11 +162,13 @@ fn init(args: Option<InitArguments>) {
 }
 
 fn is_custodian() -> CanisterResult {
+    let user = api::caller();
+    // println!("Principal: {user}");
     STATE.with_borrow(|state| {
         state
             .canister_metadata
             .custodians
-            .contains(&api::caller())
+            .contains(&user)
             .then_some(())
             .ok_or(CanisterError::NotCustodian.into())
     })
@@ -175,6 +177,11 @@ fn is_custodian() -> CanisterResult {
 #[query(name = "getCanisterMetadata")]
 fn get_canister_metadata() -> CanisterMetaData {
     STATE.with(|state| state.borrow().canister_metadata.clone())
+}
+
+#[query(name = "getMyPrincipal")]
+fn get_my_principal() -> Principal {
+    api::caller()
 }
 
 #[query(name = "getCanisterStats")]
@@ -306,9 +313,10 @@ fn get_canister_supply() -> Nat {
     STATE.with_borrow(|state| Nat::from(state.stats.total_supply))
 }
 
-#[update(name = "mint", guard = "is_custodian")]
+#[update(name = "mint")]
 fn mint_token(
     user: Principal,
+    username: String,
     token_id: Option<TokenIdentifier>,
     token_data: TokenData,
     properties: Option<Vec<(String, GenericValue)>>,
@@ -334,6 +342,9 @@ fn mint_token(
             state.stats.total_unique_holders += 1;
         }
 
+        // Adds user's name that owns the token
+        state.owner_names.entry(username).or_insert(user);
+
         state.stats.total_supply += 1;
 
         Ok(token_id)
@@ -351,6 +362,17 @@ fn get_token_data(token_id: TokenIdentifier) -> NftResult<TokenData> {
     })
 }
 
+#[query(name = "getUserByName")]
+fn get_user_by_name(username: String) -> NftResult<Principal> {
+    STATE.with_borrow(|state| {
+        state
+            .owner_names
+            .get(&username)
+            .ok_or(NftError::OwnerNotFound)
+            .map(ToOwned::to_owned)
+    })
+}
+
 #[update(name = "burnToken", guard = "is_custodian")]
 fn burn_token(token_id: TokenIdentifier) -> NftResult {
     STATE.with_borrow_mut(|state| {
@@ -358,7 +380,7 @@ fn burn_token(token_id: TokenIdentifier) -> NftResult {
             token.metadata.is_burned = true;
             token.metadata.burned_at = Some(api::time());
             token.metadata.burned_by = Some(api::caller());
-            token.metadata.owner = Principal::anonymous();
+            token.metadata.owner = Principal::from_slice(&[]);
             state.stats.total_supply -= 1;
             Ok(())
         } else {

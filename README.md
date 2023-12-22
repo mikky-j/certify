@@ -1,61 +1,71 @@
-# certify
+# Certify
 
-Welcome to your new certify project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+Certify is a platform that leverages the [Internet Computer Protocol](https://internetcomputer.org/) (ICP) to securely store user certifications along with providing an intuitive user interface for discovering and viewing them.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+## Why Certify? 🤔
 
-To learn more before you start working with certify, see the following documentation available online:
+Certify aims to solve the problem of ensuring the authenticity of user certifications. We aim to store certifications such as academic diplomas and MOOC micro-credentials in order to reduce fraudulent claims.
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
+An area we're particularly focused on is easing the process of verification -- currently verification of a certificate involves long-winded communication between pre-trusted parties. There's currently no reasonable, secure way to perform these actions in a trustless environment.
 
-If you want to start working on your project right away, you might want to try the following commands:
+We solve this by utilising technolgies provded by the ICP for a revolutionary approach to this, check out [how it works](#how-it-works).
 
-```bash
-cd certify/
-dfx help
-dfx canister --help
-```
+## Features:
 
-## Running the project locally
+Certify offers the following features:
 
-If you want to test your project locally, you can use the following commands:
+- **Certificate Storage**: It enables users to store their various certificates on the Internet Computer.
 
-```bash
-# Starts the replica, running in the background
-dfx start --background
+- **Certificate Discovery**: It enables authorised users (such as employers) to view other people's verified certificates using their [Internet Identity](https://identity.ic0.app/).
 
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
-```
+### How it works:
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+Certify uses various features provded only by the ICP for its essential operations. Some of it are:
 
-If you have made changes to your backend canister, you can generate a new candid interface with
+- **ICP Storage**: We store certicates as Non-Fungible Tokens (NFTs) on the Internet Computer. Certify implements a custom version of the [DIP721 specification](https://github.com/Psychedelic/DIP721/blob/develop/spec.md) in order to effectively store a user's certficates.
+- **Search Functionality**: In our backend canister, we implement various endpoints that helps us to effectively search for certificates and retrieve the associated data with a certificate.
 
-```bash
-npm run generate
-```
+## Usage:
 
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
+Connect to our [backend canister](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ggudy-cyaaa-aaaan-qlgwq-cai)and login with an Internet Identity and have fun 😁.
 
-If you are making frontend changes, you can start a development server with
+> [!NOTE]
+> Minting was limited to the canister administators in this MPV.
+>
+> Bringing minting to the frontend is a work in progress.
 
-```bash
-npm start
-```
+## Building locally:
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+1.  Install the development dependencies:
 
-### Note on frontend environment variables
+    - Rust toolchain (minimum version: 1.73.0): Install [Rustup](https://rustup.rs) and follow the instructions.
+    - DFINITY command-line execution environment: Follow the [installation instructions](https://internetcomputer.org/docs/current/developer-docs/setup/install/#installing-the-ic-sdk-1).
+    - Just: Follow the [installation instructions](https://github.com/casey/just#installation).
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
+    You can check if these are installed correctly by running `cargo --version` & `dfx --version` at a terminal.
 
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+2.  Clone the repository using `git`:
+
+    ```sh
+    $ git clone https://github.com/mikky-j/certify.git
+    ```
+
+3.  Change directories into the project folder:
+
+    ```sh
+    $ cd certify
+    ```
+
+4.  Add the `wasm32-unknown-unknown` target along with the `candid-extractor` package:
+
+    ```sh
+    $ just prepare
+    ```
+
+5.  Start a local canister execution environment and deploy the canister:
+
+    ```sh
+    $ just
+    ```
+
+6.  Navigate to the link [here](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ggudy-cyaaa-aaaan-qlgwq-cai).
