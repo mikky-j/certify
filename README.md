@@ -4,7 +4,7 @@ Certify is a platform that leverages the [Internet Computer Protocol](https://in
 
 ## TLDR; want to see it in action?
 
-Check out the live deployment [here](<](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ggudy-cyaaa-aaaan-qlgwq-cai)>).
+Check out the live deployment [here](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ggudy-cyaaa-aaaan-qlgwq-ca).
 
 ## Why Certify? 🤔
 
