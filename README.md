@@ -2,13 +2,17 @@
 
 Certify is a platform that leverages the [Internet Computer Protocol](https://internetcomputer.org/) (ICP) to securely store user certifications along with providing an intuitive user interface for discovering and viewing them.
 
+## TLDR; want to see it in action?
+
+Check out the live deployment [here](<](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ggudy-cyaaa-aaaan-qlgwq-cai)>).
+
 ## Why Certify? 🤔
 
 Certify aims to solve the problem of ensuring the authenticity of user certifications. We aim to store certifications such as academic diplomas and MOOC micro-credentials in order to reduce fraudulent claims.
 
-An area we're particularly focused on is easing the process of verification -- currently verification of a certificate involves long-winded communication between pre-trusted parties. There's currently no reasonable, secure way to perform these actions in a trustless environment.
+An area we're particularly focused on is easing the process of verification -- currently verification of a certificate involves long-winded communication between pre-trusted parties. There's currently no reasonable, secure way to perform these actions in a trus-tless environment.
 
-We solve this by utilising technolgies provded by the ICP for a revolutionary approach to this, check out [how it works](#how-it-works).
+We solve this by utilising technologies provided by the ICP for a revolutionary approach to this, check out [how it works](#how-it-works).
 
 ## Features:
 
@@ -20,9 +24,9 @@ Certify offers the following features:
 
 ### How it works:
 
-Certify uses various features provded only by the ICP for its essential operations. Some of it are:
+Certify uses various features provided only by the ICP for its essential operations. Some of it are:
 
-- **ICP Storage**: We store certicates as Non-Fungible Tokens (NFTs) on the Internet Computer. Certify implements a custom version of the [DIP721 specification](https://github.com/Psychedelic/DIP721/blob/develop/spec.md) in order to effectively store a user's certficates.
+- **ICP Storage**: We store certificates as Non-Fungible Tokens (NFTs) on the Internet Computer. Certify implements a custom version of the [DIP721 specification](https://github.com/Psychedelic/DIP721/blob/develop/spec.md) in order to effectively store a user's certificates.
 - **Search Functionality**: In our backend canister, we implement various endpoints that helps us to effectively search for certificates and retrieve the associated data with a certificate.
 
 ## Usage:
@@ -68,4 +72,4 @@ Connect to our [backend canister](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.i
     $ just
     ```
 
-6.  Navigate to the link [here](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ggudy-cyaaa-aaaan-qlgwq-cai).
+6.  Navigate to the link shown.
